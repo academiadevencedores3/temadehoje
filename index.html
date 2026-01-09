@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tema de Hoje</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            background-color: #050505;
+            color: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        /* --- TEMA CLARO (LIGHT MODE) --- */
+        body.light-mode {
+            background-color: #f0f0f0;
+            color: #1a1a1a;
+        }
+
+        body.light-mode .bg-grid {
+            background-image: 
+                linear-gradient(rgba(200, 200, 200, 0.5) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(200, 200, 200, 0.5) 1px, transparent 1px);
+        }
+
+        body.light-mode .neon-blue {
+            color: #008ca3;
+            text-shadow: 0 0 15px rgba(0, 229, 255, 0.6);
+        }
+        body.light-mode .neon-yellow {
+            color: #bfa004;
+            text-shadow: 0 0 15px rgba(255, 235, 59, 0.6);
+        }
+        
+        /* Inputs no Light Mode */
+        body.light-mode input, body.light-mode textarea {
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #333;
+            border-color: #ccc;
+        }
+        
+        body.light-mode .drop-zone {
+            border-color: #aaa;
+            background-color: rgba(255, 255, 255, 0.5);
+            color: #555;
+        }
+        body.light-mode .drop-zone:hover {
+            background-color: rgba(255, 255, 255, 0.8);
+            border-color: #008ca3;
+        }
+
+        /* --- FIM TEMA CLARO --- */
+
+        .bg-grid {
+            background-image: 
+                linear-gradient(rgba(20, 20, 30, 0.5) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(20, 20, 30, 0.5) 1px, transparent 1px);
+            background-size: 50px 50px;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: -1;
+            opacity: 0.3;
+            transition: background-image 0.5s ease;
+        }
+
+        .quote-font {
+            font-family: 'Cinzel Decorative', cursive;
+            line-height: 1.3;
+        }
+
+        /* Neon Azul */
+        .neon-blue {
+            color: #fff;
+            text-shadow:
+                0 0 5px #fff,
+                0 0 10px #fff,
+                0 0 20px #00e5ff,
+                0 0 40px #00e5ff,
+                0 0 80px #00e5ff;
+            animation: flicker-blue 3s infinite alternate;
+            transition: color 0.5s, text-shadow 0.5s;
+        }
+
+        /* Neon Amarelo */
+        .neon-yellow {
+            color: #fff;
+            text-shadow:
+                0 0 5px #fff,
+                0 0 10px #fff,
+                0 0 20px #ffeb3b,
+                0 0 40px #ffeb3b,
+                0 0 80px #ffeb3b;
+            animation: flicker-yellow 4s infinite alternate;
+            transition: color 0.5s, text-shadow 0.5s;
+        }
+
+        @keyframes flicker-blue {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
+            20%, 24%, 55% { opacity: 0.8; }
+        }
+
+        @keyframes flicker-yellow {
+            0%, 18%, 22%, 25%, 53%, 57%, 100% { opacity: 1; }
+            20%, 24%, 55% { opacity: 0.6; }
+        }
+
+        .floating-bible {
+            animation: float 6s ease-in-out infinite;
+            filter: drop-shadow(0 0 30px rgba(0, 229, 255, 0.2));
+            transition: filter 0.5s;
+        }
+        
+        body.light-mode .floating-bible {
+            filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.2));
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(1deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        .cross-glow {
+            filter: drop-shadow(0 0 10px #ffeb3b);
+            animation: pulse-cross 3s infinite;
+        }
+
+        @keyframes pulse-cross {
+            0% { filter: drop-shadow(0 0 5px #ffeb3b); }
+            50% { filter: drop-shadow(0 0 20px #ffeb3b); }
+            100% { filter: drop-shadow(0 0 5px #ffeb3b); }
+        }
+
+        /* Utilitários de Transição de Visualização */
+        .fade-hidden {
+            opacity: 0;
+            pointer-events: none;
+            position: absolute;
+            transition: opacity 0.5s ease;
+        }
+        .fade-visible {
+            opacity: 1;
+            pointer-events: auto;
+            position: relative;
+            transition: opacity 0.5s ease;
+        }
+
+        /* Estilo da Área de Drop */
+        .drop-zone {
+            border: 2px dashed #444;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .drop-zone:hover {
+            border-color: #00e5ff;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Botão de Contato Profissional */
+        .contact-btn {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            border: 1px solid #4b5563;
+            color: #d1d5db;
+            transition: all 0.3s ease;
+        }
+        .contact-btn:hover {
+            border-color: #ffffff;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+        }
+        
+        /* Adaptação Light Mode para o Botão de Contato */
+        body.light-mode .contact-btn {
+            background-color: rgba(255, 255, 255, 0.6);
+            border-color: #cbd5e1;
+            color: #334155;
+        }
+        body.light-mode .contact-btn:hover {
+            border-color: #008ca3;
+            color: #008ca3;
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 20px rgba(0, 140, 163, 0.2);
+        }
+    </style>
+</head>
+<body class="min-h-screen w-full flex flex-col items-center justify-center p-6 relative text-center transition-colors duration-500">
+
+    <!-- Botão de Alternar Tema (Superior Direito) -->
+    <button id="theme-toggle" class="fixed top-6 right-6 z-50 p-3 rounded-full border border-gray-600 hover:border-white bg-black/50 backdrop-blur-sm transition-all duration-300 hover:scale-110 group" aria-label="Alternar Tema">
+        <svg id="icon-sun" class="w-6 h-6 text-yellow-400 block group-hover:rotate-90 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+        </svg>
+        <svg id="icon-moon" class="w-6 h-6 text-blue-300 hidden transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+        </svg>
+    </button>
+
+    <!-- Botão Fale Conosco (Inferior Direito) -->
+    <a href="https://linktr.ee/renatoevangelista" class="contact-btn fixed bottom-6 right-6 z-50 flex items-center gap-3 px-6 py-3 rounded-full shadow-lg group no-underline">
+        <span class="text-sm font-semibold tracking-widest uppercase">Fale Conosco</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:rotate-12 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+    </a>
+
+    <!-- Fundo Grade -->
+    <div class="bg-grid"></div>
+
+    <!-- VIEW 1: Conteúdo Principal (Citação Original) -->
+    <div id="main-view" class="fade-visible w-full max-w-6xl flex flex-col items-center gap-6 md:gap-10 my-10 transition-all duration-500">
+        
+        <!-- SVG da Bíblia -->
+        <div class="floating-bible w-32 h-32 md:w-48 md:h-48 lg:w-56 lg:h-56 shrink-0">
+            <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 30 C 20 20, 40 10, 60 15 L 170 45 C 190 50, 190 70, 170 70 L 60 40 Z" fill="#1a1a1a" />
+                <path d="M25 35 L 165 65 L 165 175 L 25 150 Z" fill="#e0e0e0" />
+                <path d="M25 150 L 165 175" stroke="#ccc" stroke-width="2"/>
+                <path d="M25 145 L 165 170" stroke="#ccc" stroke-width="2"/>
+                <path d="M25 140 L 165 165" stroke="#ccc" stroke-width="2"/>
+                <path d="M20 30 C 10 30, 5 40, 5 50 L 5 160 C 5 170, 15 180, 30 180 L 140 195 C 160 198, 175 185, 175 175 L 175 65 C 175 50, 150 40, 140 38 L 30 20 Z" fill="#0a0a0a" stroke="#222" stroke-width="2"/>
+                <path d="M15 50 L 15 160" stroke="#b8860b" stroke-width="2" opacity="0.5"/>
+                <path d="M165 65 L 165 175" stroke="#b8860b" stroke-width="2" opacity="0.5"/>
+                <rect x="25" y="45" width="130" height="130" rx="5" transform="rotate(9 90 110)" stroke="#b8860b" stroke-width="1.5" fill="none" opacity="0.3"/>
+                <g class="cross-glow" transform="rotate(9 90 110)">
+                    <rect x="85" y="60" width="10" height="80" fill="url(#gold-gradient)" rx="2"/>
+                    <rect x="65" y="80" width="50" height="10" fill="url(#gold-gradient)" rx="2"/>
+                </g>
+                <defs>
+                    <linearGradient id="gold-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#ffd700;stop-opacity:1" />
+                        <stop offset="50%" style="stop-color:#fffacd;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#daa520;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+            </svg>
+        </div>
+
+        <!-- A Citação -->
+        <blockquote class="quote-font text-2xl sm:text-3xl md:text-5xl lg:text-6xl tracking-wide max-w-5xl leading-snug">
+            "Os maiores <span class="neon-blue transition-all duration-300 hover:scale-105 inline-block cursor-default">adulteradores</span> da Bíblia não são, pois, os seus tradutores, mas seus <span class="neon-yellow transition-all duration-300 hover:scale-105 inline-block cursor-default">intérpretes</span>."
+        </blockquote>
+
+        <div class="w-24 h-1 bg-gradient-to-r from-transparent via-gray-700 to-transparent separator"></div>
+
+        <!-- Botão para Ir ao Tema de Hoje -->
+        <button onclick="switchView('topic')" class="mt-4 px-8 py-3 bg-transparent border border-gray-500 text-gray-400 font-serif tracking-widest hover:border-yellow-400 hover:text-yellow-400 hover:shadow-[0_0_15px_rgba(255,235,59,0.3)] transition-all duration-300 rounded uppercase text-sm">
+            Criar Tema de Hoje
+        </button>
+    </div>
+
+
+    <!-- VIEW 2: Tema de Hoje (Upload + Texto) -->
+    <div id="topic-view" class="fade-hidden w-full max-w-5xl flex flex-col items-center gap-6 my-10 absolute top-0">
+        
+        <!-- Cabeçalho da Seção -->
+        <div class="w-full flex justify-between items-center mb-4 max-w-2xl">
+            <button onclick="switchView('main')" class="flex items-center gap-2 text-gray-500 hover:text-white transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Voltar
+            </button>
+            <h2 class="text-xl font-serif tracking-widest uppercase text-gray-400">Tema de Hoje</h2>
+            <div class="w-16"></div> <!-- Espaçador para centralizar título -->
+        </div>
+
+        <!-- Área de Preview (Resultado Final) -->
+        <div class="flex flex-col items-center gap-6 w-full">
+            <!-- Imagem Carregada -->
+            <div id="image-preview-container" class="hidden relative group transition-all duration-500">
+                <img id="image-display" src="" alt="Tema de Hoje" class="max-w-full max-h-[65vh] object-contain rounded-sm shadow-2xl border-2 border-gray-800">
+                <!-- Sombra neon opcional na imagem -->
+                <div class="absolute inset-0 rounded-sm shadow-[0_0_30px_rgba(0,229,255,0.1)] pointer-events-none"></div>
+            </div>
+
+            <!-- Texto do Tema (Renderizado) -->
+            <blockquote id="text-display" class="quote-font text-xl sm:text-2xl md:text-3xl tracking-wide max-w-4xl leading-snug min-h-[3rem]">
+                <!-- O texto aparecerá aqui -->
+                Seu tema aparecerá aqui...
+            </blockquote>
+        </div>
+
+        <!-- Controles de Edição -->
+        <div class="w-full max-w-2xl bg-white/5 p-6 rounded-lg backdrop-blur-sm border border-gray-800 mt-8 flex flex-col gap-4">
+            
+            <!-- Upload -->
+            <div class="flex flex-col gap-2">
+                <label class="text-xs uppercase tracking-widest text-gray-500">1. Carregar Imagem</label>
+                <label class="drop-zone flex flex-col items-center justify-center h-24 rounded border-dashed text-gray-400 hover:text-white">
+                    <span class="text-sm">Clique para upload ou arraste a foto</span>
+                    <input type="file" id="image-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+                </label>
+            </div>
+
+            <!-- Entrada de Texto -->
+            <div class="flex flex-col gap-2">
+                <div class="flex justify-between items-end">
+                    <label class="text-xs uppercase tracking-widest text-gray-500">2. Escrever Tema</label>
+                    <div class="text-[10px] text-gray-500 space-x-2">
+                        <span>Use <span class="text-cyan-400">*azul*</span></span>
+                        <span>Use <span class="text-yellow-400">#amarelo#</span></span>
+                    </div>
+                </div>
+                <textarea id="text-input" rows="2" placeholder="Digite aqui... Ex: O *Senhor* é meu #pastor#." 
+                    class="w-full bg-black/30 border border-gray-700 rounded p-3 text-white focus:border-cyan-500 focus:outline-none transition-colors font-sans"
+                    oninput="updateTextDisplay()"></textarea>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Lógica de Navegação ---
+        const mainView = document.getElementById('main-view');
+        const topicView = document.getElementById('topic-view');
+
+        function switchView(viewName) {
+            if (viewName === 'topic') {
+                mainView.classList.remove('fade-visible');
+                mainView.classList.add('fade-hidden');
+                
+                // Pequeno delay para permitir a transição de saída
+                setTimeout(() => {
+                    mainView.style.display = 'none'; // Remove do layout
+                    topicView.style.display = 'flex'; // Adiciona ao layout
+                    
+                    // Força reflow para animação funcionar
+                    void topicView.offsetWidth; 
+                    
+                    topicView.classList.remove('fade-hidden');
+                    topicView.classList.add('fade-visible');
+                }, 500);
+            } else {
+                topicView.classList.remove('fade-visible');
+                topicView.classList.add('fade-hidden');
+                
+                setTimeout(() => {
+                    topicView.style.display = 'none';
+                    mainView.style.display = 'flex';
+                    
+                    void mainView.offsetWidth;
+                    
+                    mainView.classList.remove('fade-hidden');
+                    mainView.classList.add('fade-visible');
+                }, 500);
+            }
+        }
+
+        // --- Lógica de Upload de Imagem ---
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imgDisplay = document.getElementById('image-display');
+                    const imgContainer = document.getElementById('image-preview-container');
+                    
+                    imgDisplay.src = e.target.result;
+                    imgContainer.classList.remove('hidden');
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // --- Lógica de Renderização de Texto (Neon Parser) ---
+        function updateTextDisplay() {
+            const input = document.getElementById('text-input').value;
+            const display = document.getElementById('text-display');
+            
+            if (!input.trim()) {
+                display.innerHTML = '<span class="text-gray-600 opacity-50 text-xl font-sans">Visualização do texto...</span>';
+                return;
+            }
+
+            // Escapar HTML básico para segurança
+            let formatted = input.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+            // Parser para Azul (*texto*)
+            // Regex: Captura texto entre asteriscos
+            formatted = formatted.replace(/\*([^\*]+)\*/g, 
+                '<span class="neon-blue transition-all duration-300 hover:scale-105 inline-block cursor-default">$1</span>');
+
+            // Parser para Amarelo (#texto#)
+            // Regex: Captura texto entre cerquilhas
+            formatted = formatted.replace(/#([^#]+)#/g, 
+                '<span class="neon-yellow transition-all duration-300 hover:scale-105 inline-block cursor-default">$1</span>');
+
+            // Quebras de linha
+            formatted = formatted.replace(/\n/g, '<br>');
+
+            display.innerHTML = formatted;
+        }
+
+        // --- Lógica de Alternância de Tema (Existente) ---
+        const themeToggle = document.getElementById('theme-toggle');
+        const iconSun = document.getElementById('icon-sun');
+        const iconMoon = document.getElementById('icon-moon');
+        const body = document.body;
+        const separator = document.querySelector('.separator');
+
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('light-mode');
+            
+            if (body.classList.contains('light-mode')) {
+                iconSun.classList.add('hidden');
+                iconSun.classList.remove('block');
+                iconMoon.classList.remove('hidden');
+                iconMoon.classList.add('block');
+                
+                themeToggle.classList.remove('bg-black/50', 'border-gray-600');
+                themeToggle.classList.add('bg-white/50', 'border-gray-300', 'shadow-md');
+                
+                if(separator) {
+                    separator.classList.remove('via-gray-700');
+                    separator.classList.add('via-gray-400');
+                }
+            } else {
+                iconSun.classList.remove('hidden');
+                iconSun.classList.add('block');
+                iconMoon.classList.add('hidden');
+                iconMoon.classList.remove('block');
+                
+                themeToggle.classList.add('bg-black/50', 'border-gray-600');
+                themeToggle.classList.remove('bg-white/50', 'border-gray-300', 'shadow-md');
+
+                if(separator) {
+                    separator.classList.add('via-gray-700');
+                    separator.classList.remove('via-gray-400');
+                }
+            }
+        });
+
+        // Parallax (Aplicado a qualquer elemento floating-bible visível)
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            const bibles = document.querySelectorAll('.floating-bible'); // Pega todas as instâncias se houver
+            
+            bibles.forEach(bible => {
+                // Apenas anima se estiver visível (opcional, mas bom para performance)
+                if(bible.offsetParent !== null) {
+                    bible.style.transform = `translate(${x * -15}px, ${y * -15}px)`;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
