@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tema de Hoje</title>
+    <title>Citação Bíblica Neon</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -190,6 +190,30 @@
             background-color: rgba(255, 255, 255, 0.9);
             box-shadow: 0 0 20px rgba(0, 140, 163, 0.2);
         }
+
+        /* Botões do Slideshow */
+        .slide-nav-btn {
+            background-color: rgba(0,0,0,0.5);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(4px);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .slide-nav-btn:hover {
+            background-color: rgba(0, 229, 255, 0.3);
+            border-color: rgba(0, 229, 255, 0.8);
+            transform: scale(1.1);
+        }
+        body.light-mode .slide-nav-btn {
+            background-color: rgba(255,255,255,0.6);
+            color: #333;
+            border-color: rgba(0,0,0,0.1);
+        }
+        body.light-mode .slide-nav-btn:hover {
+            background-color: rgba(0, 140, 163, 0.2);
+            color: #008ca3;
+        }
     </style>
 </head>
 <body class="min-h-screen w-full flex flex-col items-center justify-center p-6 relative text-center transition-colors duration-500">
@@ -205,7 +229,7 @@
     </button>
 
     <!-- Botão Fale Conosco (Inferior Direito) -->
-    <a href="https://linktr.ee/renatoevangelista" class="contact-btn fixed bottom-6 right-6 z-50 flex items-center gap-3 px-6 py-3 rounded-full shadow-lg group no-underline">
+    <a href="mailto:contato@exemplo.com" class="contact-btn fixed bottom-6 right-6 z-50 flex items-center gap-3 px-6 py-3 rounded-full shadow-lg group no-underline">
         <span class="text-sm font-semibold tracking-widest uppercase">Fale Conosco</span>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:rotate-12 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -262,7 +286,7 @@
     <div id="topic-view" class="fade-hidden w-full max-w-5xl flex flex-col items-center gap-6 my-10 absolute top-0">
         
         <!-- Cabeçalho da Seção -->
-        <div class="w-full flex justify-between items-center mb-4 max-w-2xl">
+        <div class="w-full flex justify-between items-center mb-4 max-w-2xl px-4">
             <button onclick="switchView('main')" class="flex items-center gap-2 text-gray-500 hover:text-white transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -273,13 +297,38 @@
             <div class="w-16"></div> <!-- Espaçador para centralizar título -->
         </div>
 
-        <!-- Área de Preview (Resultado Final) -->
-        <div class="flex flex-col items-center gap-6 w-full">
-            <!-- Imagem Carregada -->
-            <div id="image-preview-container" class="hidden relative group transition-all duration-500">
-                <img id="image-display" src="" alt="Tema de Hoje" class="max-w-full max-h-[65vh] object-contain rounded-sm shadow-2xl border-2 border-gray-800">
-                <!-- Sombra neon opcional na imagem -->
-                <div class="absolute inset-0 rounded-sm shadow-[0_0_30px_rgba(0,229,255,0.1)] pointer-events-none"></div>
+        <!-- Área de Preview (Resultado Final com Slideshow) -->
+        <div class="flex flex-col items-center gap-6 w-full px-4">
+            
+            <!-- Container do Slideshow (Flex Row para setas ficarem fora) -->
+            <div id="slideshow-wrapper" class="hidden w-full flex-row items-center justify-center gap-4 md:gap-8">
+                
+                <!-- Botão Anterior (Fora da imagem) -->
+                <button id="btn-prev" onclick="changeSlide(-1)" class="hidden slide-nav-btn p-3 rounded-full shadow-lg shrink-0 z-20">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+
+                <!-- Container da Imagem (Relativo para contador) -->
+                <div class="relative group">
+                    <!-- Imagem Atual -->
+                    <!-- Sombra aplicada diretamente na imagem para respeitar as dimensões exatas -->
+                    <img id="image-display" src="" alt="Tema de Hoje" class="max-w-[70vw] md:max-w-[60vw] max-h-[60vh] object-contain rounded-sm shadow-[0_0_30px_rgba(0,229,255,0.15)] border-2 border-gray-800 transition-opacity duration-300">
+                    
+                    <!-- Contador de Slides -->
+                    <div id="slide-counter" class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/60 text-white px-3 py-1 rounded-full text-xs tracking-widest backdrop-blur-sm hidden pointer-events-none">
+                        1 / 1
+                    </div>
+                </div>
+
+                <!-- Botão Próximo (Fora da imagem) -->
+                <button id="btn-next" onclick="changeSlide(1)" class="hidden slide-nav-btn p-3 rounded-full shadow-lg shrink-0 z-20">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+
             </div>
 
             <!-- Texto do Tema (Renderizado) -->
@@ -294,10 +343,13 @@
             
             <!-- Upload -->
             <div class="flex flex-col gap-2">
-                <label class="text-xs uppercase tracking-widest text-gray-500">1. Carregar Imagem</label>
-                <label class="drop-zone flex flex-col items-center justify-center h-24 rounded border-dashed text-gray-400 hover:text-white">
-                    <span class="text-sm">Clique para upload ou arraste a foto</span>
-                    <input type="file" id="image-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+                <label class="text-xs uppercase tracking-widest text-gray-500">1. Carregar Imagens (Slides)</label>
+                <label class="drop-zone flex flex-col items-center justify-center h-24 rounded border-dashed text-gray-400 hover:text-white transition-colors">
+                    <div class="flex flex-col items-center">
+                        <span class="text-sm font-semibold">Clique para selecionar várias fotos</span>
+                        <span class="text-xs text-gray-500 mt-1">Formatos: JPG, PNG, GIF</span>
+                    </div>
+                    <input type="file" id="image-upload" accept="image/*" multiple class="hidden" onchange="handleImageUpload(event)">
                 </label>
             </div>
 
@@ -328,14 +380,10 @@
                 mainView.classList.remove('fade-visible');
                 mainView.classList.add('fade-hidden');
                 
-                // Pequeno delay para permitir a transição de saída
                 setTimeout(() => {
-                    mainView.style.display = 'none'; // Remove do layout
-                    topicView.style.display = 'flex'; // Adiciona ao layout
-                    
-                    // Força reflow para animação funcionar
+                    mainView.style.display = 'none';
+                    topicView.style.display = 'flex';
                     void topicView.offsetWidth; 
-                    
                     topicView.classList.remove('fade-hidden');
                     topicView.classList.add('fade-visible');
                 }, 500);
@@ -346,32 +394,92 @@
                 setTimeout(() => {
                     topicView.style.display = 'none';
                     mainView.style.display = 'flex';
-                    
                     void mainView.offsetWidth;
-                    
                     mainView.classList.remove('fade-hidden');
                     mainView.classList.add('fade-visible');
                 }, 500);
             }
         }
 
-        // --- Lógica de Upload de Imagem ---
+        // --- Variáveis e Lógica do Slideshow ---
+        let slideImages = [];
+        let currentSlideIndex = 0;
+
         function handleImageUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const imgDisplay = document.getElementById('image-display');
-                    const imgContainer = document.getElementById('image-preview-container');
-                    
-                    imgDisplay.src = e.target.result;
-                    imgContainer.classList.remove('hidden');
-                }
-                reader.readAsDataURL(file);
+            const files = event.target.files;
+            if (files && files.length > 0) {
+                // Resetar o estado
+                slideImages = [];
+                currentSlideIndex = 0;
+                
+                const readers = [];
+                
+                // Ler todos os arquivos selecionados
+                Array.from(files).forEach(file => {
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        const promise = new Promise((resolve) => {
+                            reader.onload = (e) => resolve(e.target.result);
+                        });
+                        reader.readAsDataURL(file);
+                        readers.push(promise);
+                    }
+                });
+
+                // Quando todas as imagens carregarem
+                Promise.all(readers).then(images => {
+                    slideImages = images;
+                    if (slideImages.length > 0) {
+                        updateSlideDisplay();
+                        // Mostra o wrapper principal e garante display flex
+                        const wrapper = document.getElementById('slideshow-wrapper');
+                        wrapper.classList.remove('hidden');
+                        wrapper.classList.add('flex');
+                    }
+                });
             }
         }
 
-        // --- Lógica de Renderização de Texto (Neon Parser) ---
+        function updateSlideDisplay() {
+            const imgDisplay = document.getElementById('image-display');
+            const btnPrev = document.getElementById('btn-prev');
+            const btnNext = document.getElementById('btn-next');
+            const counter = document.getElementById('slide-counter');
+
+            // Atualiza a imagem com efeito de fade simples
+            imgDisplay.style.opacity = '0';
+            setTimeout(() => {
+                imgDisplay.src = slideImages[currentSlideIndex];
+                imgDisplay.style.opacity = '1';
+            }, 150);
+            
+            // Mostrar/Esconder controles se houver mais de 1 imagem
+            if (slideImages.length > 1) {
+                btnPrev.classList.remove('hidden');
+                btnNext.classList.remove('hidden');
+                counter.classList.remove('hidden');
+                counter.textContent = `${currentSlideIndex + 1} / ${slideImages.length}`;
+            } else {
+                btnPrev.classList.add('hidden');
+                btnNext.classList.add('hidden');
+                counter.classList.add('hidden');
+            }
+        }
+
+        function changeSlide(step) {
+            currentSlideIndex += step;
+            
+            // Loop infinito
+            if (currentSlideIndex >= slideImages.length) {
+                currentSlideIndex = 0;
+            } else if (currentSlideIndex < 0) {
+                currentSlideIndex = slideImages.length - 1;
+            }
+            
+            updateSlideDisplay();
+        }
+
+        // --- Lógica de Renderização de Texto ---
         function updateTextDisplay() {
             const input = document.getElementById('text-input').value;
             const display = document.getElementById('text-display');
@@ -381,26 +489,20 @@
                 return;
             }
 
-            // Escapar HTML básico para segurança
             let formatted = input.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-            // Parser para Azul (*texto*)
-            // Regex: Captura texto entre asteriscos
             formatted = formatted.replace(/\*([^\*]+)\*/g, 
                 '<span class="neon-blue transition-all duration-300 hover:scale-105 inline-block cursor-default">$1</span>');
 
-            // Parser para Amarelo (#texto#)
-            // Regex: Captura texto entre cerquilhas
             formatted = formatted.replace(/#([^#]+)#/g, 
                 '<span class="neon-yellow transition-all duration-300 hover:scale-105 inline-block cursor-default">$1</span>');
 
-            // Quebras de linha
             formatted = formatted.replace(/\n/g, '<br>');
 
             display.innerHTML = formatted;
         }
 
-        // --- Lógica de Alternância de Tema (Existente) ---
+        // --- Tema (Dark/Light) ---
         const themeToggle = document.getElementById('theme-toggle');
         const iconSun = document.getElementById('icon-sun');
         const iconMoon = document.getElementById('icon-moon');
@@ -439,14 +541,13 @@
             }
         });
 
-        // Parallax (Aplicado a qualquer elemento floating-bible visível)
+        // Parallax
         document.addEventListener('mousemove', (e) => {
             const x = e.clientX / window.innerWidth;
             const y = e.clientY / window.innerHeight;
-            const bibles = document.querySelectorAll('.floating-bible'); // Pega todas as instâncias se houver
+            const bibles = document.querySelectorAll('.floating-bible');
             
             bibles.forEach(bible => {
-                // Apenas anima se estiver visível (opcional, mas bom para performance)
                 if(bible.offsetParent !== null) {
                     bible.style.transform = `translate(${x * -15}px, ${y * -15}px)`;
                 }
