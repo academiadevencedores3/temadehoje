@@ -55,6 +55,19 @@
             background-color: rgba(255, 255, 255, 0.8);
             border-color: #008ca3;
         }
+        
+        /* Adaptação Light Mode para botões */
+        body.light-mode .nav-action-btn {
+            background-color: rgba(255, 255, 255, 0.5);
+            border-color: #cbd5e1;
+            color: #334155;
+        }
+        body.light-mode .nav-action-btn:hover {
+            border-color: #008ca3;
+            color: #008ca3;
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 15px rgba(0, 140, 163, 0.2);
+        }
 
         /* --- FIM TEMA CLARO --- */
 
@@ -163,6 +176,18 @@
             background-color: rgba(255, 255, 255, 0.05);
         }
 
+        /* Estilo Botões de Navegação Superiores */
+        .nav-action-btn {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            border: 1px solid #4b5563;
+            transition: all 0.3s ease;
+        }
+        .nav-action-btn:hover {
+            border-color: #ffffff;
+            transform: scale(1.1);
+        }
+
         /* Botão de Contato Profissional */
         .contact-btn {
             background-color: rgba(0, 0, 0, 0.5);
@@ -178,7 +203,6 @@
             box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
         }
         
-        /* Adaptação Light Mode para o Botão de Contato */
         body.light-mode .contact-btn {
             background-color: rgba(255, 255, 255, 0.6);
             border-color: #cbd5e1;
@@ -218,18 +242,29 @@
 </head>
 <body class="min-h-screen w-full flex flex-col items-center justify-center p-6 relative text-center transition-colors duration-500">
 
-    <!-- Botão de Alternar Tema (Superior Direito) -->
-    <button id="theme-toggle" class="fixed top-6 right-6 z-50 p-3 rounded-full border border-gray-600 hover:border-white bg-black/50 backdrop-blur-sm transition-all duration-300 hover:scale-110 group" aria-label="Alternar Tema">
-        <svg id="icon-sun" class="w-6 h-6 text-yellow-400 block group-hover:rotate-90 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-        </svg>
-        <svg id="icon-moon" class="w-6 h-6 text-blue-300 hidden transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
-        </svg>
-    </button>
+    <!-- AREA DE BOTÕES SUPERIOR DIREITO -->
+    <div class="fixed top-6 right-6 z-50 flex gap-4">
+        
+        <!-- Botão Reset / Limpar (Só visível no Tema de Hoje) -->
+        <button id="reset-btn" onclick="resetForm()" class="nav-action-btn p-3 rounded-full text-red-400 hover:text-red-300 opacity-0 pointer-events-none transition-all duration-300 shadow-md group" aria-label="Limpar e Recarregar" title="Limpar Tudo">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 group-hover:-rotate-180 transition-transform duration-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+        </button>
+
+        <!-- Botão de Alternar Tema -->
+        <button id="theme-toggle" class="nav-action-btn p-3 rounded-full hover:border-white shadow-md group" aria-label="Alternar Tema">
+            <svg id="icon-sun" class="w-6 h-6 text-yellow-400 block group-hover:rotate-90 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+            </svg>
+            <svg id="icon-moon" class="w-6 h-6 text-blue-300 hidden transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+            </svg>
+        </button>
+    </div>
 
     <!-- Botão Fale Conosco (Inferior Direito) -->
-    <a href="mailto:contato@exemplo.com" class="contact-btn fixed bottom-6 right-6 z-50 flex items-center gap-3 px-6 py-3 rounded-full shadow-lg group no-underline">
+    <a href="https://linktr.ee/renatoevangelista" target="_blank" class="contact-btn fixed bottom-6 right-6 z-50 flex items-center gap-3 px-6 py-3 rounded-full shadow-lg group no-underline">
         <span class="text-sm font-semibold tracking-widest uppercase">Fale Conosco</span>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:rotate-12 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -310,14 +345,19 @@
                     </svg>
                 </button>
 
-                <!-- Container da Imagem (Relativo para contador) -->
-                <div class="relative group">
-                    <!-- Imagem Atual -->
-                    <!-- Sombra aplicada diretamente na imagem para respeitar as dimensões exatas -->
-                    <img id="image-display" src="" alt="Tema de Hoje" class="max-w-[70vw] md:max-w-[60vw] max-h-[60vh] object-contain rounded-sm shadow-[0_0_30px_rgba(0,229,255,0.15)] border-2 border-gray-800 transition-opacity duration-300">
+                <!-- Container da Mídia (Relativo para contador) -->
+                <div class="relative group flex justify-center items-center">
+                    
+                    <!-- Elemento de Imagem -->
+                    <img id="image-display" src="" alt="Tema de Hoje" class="hidden max-w-[70vw] md:max-w-[60vw] max-h-[60vh] object-contain rounded-sm shadow-[0_0_30px_rgba(0,229,255,0.15)] border-2 border-gray-800 transition-opacity duration-300">
+                    
+                    <!-- Elemento de Vídeo (Novo) -->
+                    <video id="video-display" class="hidden max-w-[70vw] md:max-w-[60vw] max-h-[60vh] object-contain rounded-sm shadow-[0_0_30px_rgba(0,229,255,0.15)] border-2 border-gray-800 transition-opacity duration-300" controls playsinline>
+                        Seu navegador não suporta a reprodução de vídeos.
+                    </video>
                     
                     <!-- Contador de Slides -->
-                    <div id="slide-counter" class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/60 text-white px-3 py-1 rounded-full text-xs tracking-widest backdrop-blur-sm hidden pointer-events-none">
+                    <div id="slide-counter" class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/60 text-white px-3 py-1 rounded-full text-xs tracking-widest backdrop-blur-sm hidden pointer-events-none z-30">
                         1 / 1
                     </div>
                 </div>
@@ -343,13 +383,14 @@
             
             <!-- Upload -->
             <div class="flex flex-col gap-2">
-                <label class="text-xs uppercase tracking-widest text-gray-500">1. Carregar Imagens (Slides)</label>
+                <label class="text-xs uppercase tracking-widest text-gray-500">1. Carregar Mídia (Imagens ou Vídeos)</label>
                 <label class="drop-zone flex flex-col items-center justify-center h-24 rounded border-dashed text-gray-400 hover:text-white transition-colors">
                     <div class="flex flex-col items-center">
-                        <span class="text-sm font-semibold">Clique para selecionar várias fotos</span>
-                        <span class="text-xs text-gray-500 mt-1">Formatos: JPG, PNG, GIF</span>
+                        <span class="text-sm font-semibold">Clique para selecionar fotos ou vídeos</span>
+                        <span class="text-xs text-gray-500 mt-1">Formatos: JPG, PNG, GIF, MP4, WEBM</span>
                     </div>
-                    <input type="file" id="image-upload" accept="image/*" multiple class="hidden" onchange="handleImageUpload(event)">
+                    <!-- Aceita agora videos e imagens -->
+                    <input type="file" id="image-upload" accept="image/*,video/*" multiple class="hidden" onchange="handleImageUpload(event)">
                 </label>
             </div>
 
@@ -374,6 +415,7 @@
         // --- Lógica de Navegação ---
         const mainView = document.getElementById('main-view');
         const topicView = document.getElementById('topic-view');
+        const resetBtn = document.getElementById('reset-btn');
 
         function switchView(viewName) {
             if (viewName === 'topic') {
@@ -386,10 +428,16 @@
                     void topicView.offsetWidth; 
                     topicView.classList.remove('fade-hidden');
                     topicView.classList.add('fade-visible');
+                    
+                    // Mostra botão de Reset
+                    resetBtn.classList.remove('opacity-0', 'pointer-events-none');
                 }, 500);
             } else {
                 topicView.classList.remove('fade-visible');
                 topicView.classList.add('fade-hidden');
+                
+                // Esconde botão de Reset
+                resetBtn.classList.add('opacity-0', 'pointer-events-none');
                 
                 setTimeout(() => {
                     topicView.style.display = 'none';
@@ -397,39 +445,49 @@
                     void mainView.offsetWidth;
                     mainView.classList.remove('fade-hidden');
                     mainView.classList.add('fade-visible');
+                    
+                    // Pausa vídeo se estiver tocando ao sair
+                    const videoDisplay = document.getElementById('video-display');
+                    if (videoDisplay) videoDisplay.pause();
                 }, 500);
             }
         }
 
         // --- Variáveis e Lógica do Slideshow ---
-        let slideImages = [];
+        let slideItems = []; 
         let currentSlideIndex = 0;
 
         function handleImageUpload(event) {
             const files = event.target.files;
             if (files && files.length > 0) {
                 // Resetar o estado
-                slideImages = [];
+                slideItems = [];
                 currentSlideIndex = 0;
                 
                 const readers = [];
                 
                 // Ler todos os arquivos selecionados
                 Array.from(files).forEach(file => {
-                    if (file.type.startsWith('image/')) {
+                    // Verifica se é imagem ou vídeo
+                    if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
                         const reader = new FileReader();
                         const promise = new Promise((resolve) => {
-                            reader.onload = (e) => resolve(e.target.result);
+                            reader.onload = (e) => {
+                                resolve({
+                                    type: file.type.startsWith('video/') ? 'video' : 'image',
+                                    src: e.target.result
+                                });
+                            };
                         });
                         reader.readAsDataURL(file);
                         readers.push(promise);
                     }
                 });
 
-                // Quando todas as imagens carregarem
-                Promise.all(readers).then(images => {
-                    slideImages = images;
-                    if (slideImages.length > 0) {
+                // Quando todos carregarem
+                Promise.all(readers).then(items => {
+                    slideItems = items;
+                    if (slideItems.length > 0) {
                         updateSlideDisplay();
                         // Mostra o wrapper principal e garante display flex
                         const wrapper = document.getElementById('slideshow-wrapper');
@@ -439,26 +497,67 @@
                 });
             }
         }
+        
+        // --- FUNÇÃO RESET/LIMPAR TUDO ---
+        function resetForm() {
+            // Limpar Variáveis
+            slideItems = [];
+            currentSlideIndex = 0;
+            
+            // Limpar Inputs
+            document.getElementById('image-upload').value = '';
+            document.getElementById('text-input').value = '';
+            
+            // Esconder Player
+            const wrapper = document.getElementById('slideshow-wrapper');
+            wrapper.classList.add('hidden');
+            wrapper.classList.remove('flex');
+            
+            // Parar Vídeo
+            const videoDisplay = document.getElementById('video-display');
+            videoDisplay.pause();
+            videoDisplay.src = "";
+            videoDisplay.classList.add('hidden');
+            
+            // Esconder Imagem
+            document.getElementById('image-display').classList.add('hidden');
+            document.getElementById('image-display').src = "";
+            
+            // Resetar Texto para Placeholder
+            updateTextDisplay();
+        }
 
         function updateSlideDisplay() {
             const imgDisplay = document.getElementById('image-display');
+            const videoDisplay = document.getElementById('video-display');
             const btnPrev = document.getElementById('btn-prev');
             const btnNext = document.getElementById('btn-next');
             const counter = document.getElementById('slide-counter');
 
-            // Atualiza a imagem com efeito de fade simples
-            imgDisplay.style.opacity = '0';
-            setTimeout(() => {
-                imgDisplay.src = slideImages[currentSlideIndex];
-                imgDisplay.style.opacity = '1';
-            }, 150);
+            const currentItem = slideItems[currentSlideIndex];
+
+            // Resetar visibilidade
+            imgDisplay.classList.add('hidden');
+            videoDisplay.classList.add('hidden');
             
-            // Mostrar/Esconder controles se houver mais de 1 imagem
-            if (slideImages.length > 1) {
+            // Pausar vídeo anterior se existir
+            videoDisplay.pause();
+
+            // Efeito Fade simples
+            if (currentItem.type === 'video') {
+                videoDisplay.src = currentItem.src;
+                videoDisplay.classList.remove('hidden');
+            } else {
+                imgDisplay.src = currentItem.src;
+                imgDisplay.classList.remove('hidden');
+            }
+            
+            // Mostrar/Esconder controles se houver mais de 1 item
+            if (slideItems.length > 1) {
                 btnPrev.classList.remove('hidden');
                 btnNext.classList.remove('hidden');
                 counter.classList.remove('hidden');
-                counter.textContent = `${currentSlideIndex + 1} / ${slideImages.length}`;
+                counter.textContent = `${currentSlideIndex + 1} / ${slideItems.length}`;
             } else {
                 btnPrev.classList.add('hidden');
                 btnNext.classList.add('hidden');
@@ -470,10 +569,10 @@
             currentSlideIndex += step;
             
             // Loop infinito
-            if (currentSlideIndex >= slideImages.length) {
+            if (currentSlideIndex >= slideItems.length) {
                 currentSlideIndex = 0;
             } else if (currentSlideIndex < 0) {
-                currentSlideIndex = slideImages.length - 1;
+                currentSlideIndex = slideItems.length - 1;
             }
             
             updateSlideDisplay();
