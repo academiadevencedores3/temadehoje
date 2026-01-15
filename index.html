@@ -238,6 +238,25 @@
             background-color: rgba(0, 140, 163, 0.2);
             color: #008ca3;
         }
+        
+        /* Botões de Paginação de Tópico */
+        .topic-nav-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+        }
+        .topic-nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        .topic-nav-btn:not(:disabled):hover {
+            background-color: rgba(255,255,255,0.1);
+            color: #00e5ff;
+        }
     </style>
 </head>
 <body class="min-h-screen w-full flex flex-col items-center justify-center p-6 relative text-center transition-colors duration-500">
@@ -246,7 +265,7 @@
     <div class="fixed top-6 right-6 z-50 flex gap-4">
         
         <!-- Botão Reset / Limpar (Só visível no Tema de Hoje) -->
-        <button id="reset-btn" onclick="resetForm()" class="nav-action-btn p-3 rounded-full text-red-400 hover:text-red-300 opacity-0 pointer-events-none transition-all duration-300 shadow-md group" aria-label="Limpar e Recarregar" title="Limpar Tudo">
+        <button id="reset-btn" onclick="resetCurrentTopic()" class="nav-action-btn p-3 rounded-full text-red-400 hover:text-red-300 opacity-0 pointer-events-none transition-all duration-300 shadow-md group" aria-label="Limpar Página Atual" title="Limpar Página Atual">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 group-hover:-rotate-180 transition-transform duration-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
@@ -320,16 +339,48 @@
     <!-- VIEW 2: Tema de Hoje (Upload + Texto) -->
     <div id="topic-view" class="fade-hidden w-full max-w-5xl flex flex-col items-center gap-6 my-10 absolute top-0">
         
-        <!-- Cabeçalho da Seção -->
-        <div class="w-full flex justify-between items-center mb-4 max-w-2xl px-4">
-            <button onclick="switchView('main')" class="flex items-center gap-2 text-gray-500 hover:text-white transition-colors">
+        <!-- Cabeçalho da Seção com Navegação de Tópicos -->
+        <div class="w-full flex flex-col md:flex-row justify-between items-center mb-4 max-w-4xl px-4 gap-4">
+            <!-- Botão Voltar -->
+            <button onclick="switchView('main')" class="flex items-center gap-2 text-gray-500 hover:text-white transition-colors self-start md:self-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
                 Voltar
             </button>
-            <h2 class="text-xl font-serif tracking-widest uppercase text-gray-400">Tema de Hoje</h2>
-            <div class="w-16"></div> <!-- Espaçador para centralizar título -->
+
+            <!-- Título e Controles de Paginação -->
+            <div class="flex items-center gap-4 bg-black/40 px-4 py-2 rounded-full border border-gray-800 backdrop-blur-sm shadow-sm">
+                
+                <!-- Seta Esquerda (Paginação) -->
+                <button id="btn-prev-topic" onclick="navigateTopics(-1)" class="topic-nav-btn text-gray-400 hover:text-white hidden" title="Página Anterior">
+                    &lt;
+                </button>
+
+                <!-- Título / Contador -->
+                <h2 class="text-lg font-serif tracking-widest uppercase text-gray-300">
+                    <span id="topic-title">Tema de Hoje</span>
+                    <span id="topic-counter" class="text-xs text-cyan-400 ml-2 bg-cyan-900/30 px-2 py-0.5 rounded hidden">1/1</span>
+                </h2>
+
+                <!-- Seta Direita (Paginação) -->
+                <button id="btn-next-topic" onclick="navigateTopics(1)" class="topic-nav-btn text-gray-400 hover:text-white hidden" title="Próxima Página">
+                    &gt;
+                </button>
+                
+                <!-- Separador -->
+                <div class="w-px h-4 bg-gray-700 mx-2"></div>
+
+                <!-- Botão Adicionar Nova Página -->
+                <button onclick="createNewTopic()" class="text-cyan-500 hover:text-cyan-300 transition-colors p-1" title="Criar Nova Página">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Espaçador para equilíbrio visual (desktop) -->
+            <div class="w-16 hidden md:block"></div>
         </div>
 
         <!-- Área de Preview (Resultado Final com Slideshow) -->
@@ -405,14 +456,232 @@
                 </div>
                 <textarea id="text-input" rows="2" placeholder="Digite aqui... Ex: O *Senhor* é meu #pastor#." 
                     class="w-full bg-black/30 border border-gray-700 rounded p-3 text-white focus:border-cyan-500 focus:outline-none transition-colors font-sans"
-                    oninput="updateTextDisplay()"></textarea>
+                    oninput="handleTextInput()"></textarea>
             </div>
         </div>
 
     </div>
 
     <script>
-        // --- Lógica de Navegação ---
+        // --- GERENCIAMENTO DE ESTADO MÚLTIPLO (PAGINAÇÃO) ---
+        // Estrutura de Tópicos: [{ id: 1, slides: [], currentSlideIdx: 0, text: "" }]
+        let topics = [{ id: Date.now(), slides: [], currentSlideIdx: 0, text: "" }];
+        let currentTopicIdx = 0;
+
+        // Elementos UI de Paginação
+        const btnPrevTopic = document.getElementById('btn-prev-topic');
+        const btnNextTopic = document.getElementById('btn-next-topic');
+        const topicCounter = document.getElementById('topic-counter');
+        const topicTitle = document.getElementById('topic-title');
+
+        // Cria uma nova página
+        function createNewTopic() {
+            topics.push({ 
+                id: Date.now(), 
+                slides: [], 
+                currentSlideIdx: 0, 
+                text: "" 
+            });
+            // Vai para a nova página
+            currentTopicIdx = topics.length - 1;
+            renderCurrentTopic();
+        }
+
+        // Navega entre as páginas
+        function navigateTopics(direction) {
+            currentTopicIdx += direction;
+            
+            // Limites de segurança
+            if (currentTopicIdx < 0) currentTopicIdx = 0;
+            if (currentTopicIdx >= topics.length) currentTopicIdx = topics.length - 1;
+
+            renderCurrentTopic();
+        }
+
+        // Renderiza a página atual baseada no índice
+        function renderCurrentTopic() {
+            const topic = topics[currentTopicIdx];
+            
+            // 1. Atualizar UI de Navegação
+            topicCounter.textContent = `${currentTopicIdx + 1}/${topics.length}`;
+            
+            if (topics.length > 1) {
+                btnPrevTopic.classList.remove('hidden');
+                btnNextTopic.classList.remove('hidden');
+                topicCounter.classList.remove('hidden');
+                topicTitle.textContent = "Página";
+            } else {
+                btnPrevTopic.classList.add('hidden');
+                btnNextTopic.classList.add('hidden');
+                topicCounter.classList.add('hidden');
+                topicTitle.textContent = "Tema de Hoje";
+            }
+
+            // Desabilitar botões nos extremos
+            btnPrevTopic.disabled = currentTopicIdx === 0;
+            btnNextTopic.disabled = currentTopicIdx === topics.length - 1;
+
+            // 2. Restaurar Inputs
+            const textInput = document.getElementById('text-input');
+            textInput.value = topic.text;
+            
+            // 3. Restaurar Preview de Texto
+            updateTextDisplay(topic.text);
+
+            // 4. Restaurar Slideshow
+            const wrapper = document.getElementById('slideshow-wrapper');
+            const imgDisplay = document.getElementById('image-display');
+            const videoDisplay = document.getElementById('video-display');
+            const btnPrevSlide = document.getElementById('btn-prev');
+            const btnNextSlide = document.getElementById('btn-next');
+            const slideCounter = document.getElementById('slide-counter');
+
+            // Pausar qualquer vídeo tocando antes de mudar
+            videoDisplay.pause();
+            videoDisplay.src = "";
+            
+            if (topic.slides.length > 0) {
+                wrapper.classList.remove('hidden');
+                wrapper.classList.add('flex');
+                
+                // Mostrar slide atual desta página
+                updateSlideView(topic);
+            } else {
+                // Esconder se não tem slides
+                wrapper.classList.add('hidden');
+                wrapper.classList.remove('flex');
+                imgDisplay.classList.add('hidden');
+                videoDisplay.classList.add('hidden');
+                btnPrevSlide.classList.add('hidden');
+                btnNextSlide.classList.add('hidden');
+                slideCounter.classList.add('hidden');
+            }
+        }
+
+        // Função auxiliar para atualizar a visualização do slide específico do tópico
+        function updateSlideView(topic) {
+            const imgDisplay = document.getElementById('image-display');
+            const videoDisplay = document.getElementById('video-display');
+            const btnPrevSlide = document.getElementById('btn-prev');
+            const btnNextSlide = document.getElementById('btn-next');
+            const slideCounter = document.getElementById('slide-counter');
+
+            const currentItem = topic.slides[topic.currentSlideIdx];
+
+            imgDisplay.classList.add('hidden');
+            videoDisplay.classList.add('hidden');
+            videoDisplay.pause();
+
+            if (currentItem.type === 'video') {
+                videoDisplay.src = currentItem.src;
+                videoDisplay.classList.remove('hidden');
+            } else {
+                imgDisplay.src = currentItem.src;
+                imgDisplay.classList.remove('hidden');
+            }
+
+            if (topic.slides.length > 1) {
+                btnPrevSlide.classList.remove('hidden');
+                btnNextSlide.classList.remove('hidden');
+                slideCounter.classList.remove('hidden');
+                slideCounter.textContent = `${topic.currentSlideIdx + 1} / ${topic.slides.length}`;
+            } else {
+                btnPrevSlide.classList.add('hidden');
+                btnNextSlide.classList.add('hidden');
+                slideCounter.classList.add('hidden');
+            }
+        }
+
+        // --- HANDLERS DE INPUT MODIFICADOS ---
+
+        function handleImageUpload(event) {
+            const files = event.target.files;
+            if (files && files.length > 0) {
+                const topic = topics[currentTopicIdx];
+                // Resetar slides desta página
+                topic.slides = [];
+                topic.currentSlideIdx = 0;
+                
+                const readers = [];
+                
+                Array.from(files).forEach(file => {
+                    if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
+                        const reader = new FileReader();
+                        const promise = new Promise((resolve) => {
+                            reader.onload = (e) => {
+                                resolve({
+                                    type: file.type.startsWith('video/') ? 'video' : 'image',
+                                    src: e.target.result
+                                });
+                            };
+                        });
+                        reader.readAsDataURL(file);
+                        readers.push(promise);
+                    }
+                });
+
+                Promise.all(readers).then(items => {
+                    topic.slides = items;
+                    renderCurrentTopic(); // Re-renderiza para mostrar os novos slides
+                });
+            }
+            // Limpa o input para permitir re-upload do mesmo arquivo
+            event.target.value = '';
+        }
+
+        function handleTextInput() {
+            const input = document.getElementById('text-input').value;
+            // Salva no estado
+            topics[currentTopicIdx].text = input;
+            // Atualiza visualização
+            updateTextDisplay(input);
+        }
+
+        // Modificado para aceitar argumento
+        function updateTextDisplay(inputText) {
+            const display = document.getElementById('text-display');
+            
+            if (!inputText || !inputText.trim()) {
+                display.innerHTML = '<span class="text-gray-600 opacity-50 text-xl font-sans">Visualização do texto...</span>';
+                return;
+            }
+
+            let formatted = inputText.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            formatted = formatted.replace(/\*([^\*]+)\*/g, '<span class="neon-blue transition-all duration-300 hover:scale-105 inline-block cursor-default">$1</span>');
+            formatted = formatted.replace(/#([^#]+)#/g, '<span class="neon-yellow transition-all duration-300 hover:scale-105 inline-block cursor-default">$1</span>');
+            formatted = formatted.replace(/\n/g, '<br>');
+
+            display.innerHTML = formatted;
+        }
+
+        // Navegação de Slides (dentro do tópico atual)
+        function changeSlide(step) {
+            const topic = topics[currentTopicIdx];
+            if (!topic.slides.length) return;
+
+            topic.currentSlideIdx += step;
+            
+            if (topic.currentSlideIdx >= topic.slides.length) {
+                topic.currentSlideIdx = 0;
+            } else if (topic.currentSlideIdx < 0) {
+                topic.currentSlideIdx = topic.slides.length - 1;
+            }
+            
+            updateSlideView(topic);
+        }
+
+        // Resetar apenas a página atual
+        function resetCurrentTopic() {
+            const topic = topics[currentTopicIdx];
+            topic.slides = [];
+            topic.currentSlideIdx = 0;
+            topic.text = "";
+            
+            // Re-renderiza para limpar a tela
+            renderCurrentTopic();
+        }
+
+        // --- Lógica de Navegação Geral ---
         const mainView = document.getElementById('main-view');
         const topicView = document.getElementById('topic-view');
         const resetBtn = document.getElementById('reset-btn');
@@ -429,14 +698,14 @@
                     topicView.classList.remove('fade-hidden');
                     topicView.classList.add('fade-visible');
                     
-                    // Mostra botão de Reset
                     resetBtn.classList.remove('opacity-0', 'pointer-events-none');
+                    // Garante que o tópico atual é renderizado corretamente ao entrar
+                    renderCurrentTopic();
                 }, 500);
             } else {
                 topicView.classList.remove('fade-visible');
                 topicView.classList.add('fade-hidden');
                 
-                // Esconde botão de Reset
                 resetBtn.classList.add('opacity-0', 'pointer-events-none');
                 
                 setTimeout(() => {
@@ -446,159 +715,10 @@
                     mainView.classList.remove('fade-hidden');
                     mainView.classList.add('fade-visible');
                     
-                    // Pausa vídeo se estiver tocando ao sair
                     const videoDisplay = document.getElementById('video-display');
                     if (videoDisplay) videoDisplay.pause();
                 }, 500);
             }
-        }
-
-        // --- Variáveis e Lógica do Slideshow ---
-        let slideItems = []; 
-        let currentSlideIndex = 0;
-
-        function handleImageUpload(event) {
-            const files = event.target.files;
-            if (files && files.length > 0) {
-                // Resetar o estado
-                slideItems = [];
-                currentSlideIndex = 0;
-                
-                const readers = [];
-                
-                // Ler todos os arquivos selecionados
-                Array.from(files).forEach(file => {
-                    // Verifica se é imagem ou vídeo
-                    if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
-                        const reader = new FileReader();
-                        const promise = new Promise((resolve) => {
-                            reader.onload = (e) => {
-                                resolve({
-                                    type: file.type.startsWith('video/') ? 'video' : 'image',
-                                    src: e.target.result
-                                });
-                            };
-                        });
-                        reader.readAsDataURL(file);
-                        readers.push(promise);
-                    }
-                });
-
-                // Quando todos carregarem
-                Promise.all(readers).then(items => {
-                    slideItems = items;
-                    if (slideItems.length > 0) {
-                        updateSlideDisplay();
-                        // Mostra o wrapper principal e garante display flex
-                        const wrapper = document.getElementById('slideshow-wrapper');
-                        wrapper.classList.remove('hidden');
-                        wrapper.classList.add('flex');
-                    }
-                });
-            }
-        }
-        
-        // --- FUNÇÃO RESET/LIMPAR TUDO ---
-        function resetForm() {
-            // Limpar Variáveis
-            slideItems = [];
-            currentSlideIndex = 0;
-            
-            // Limpar Inputs
-            document.getElementById('image-upload').value = '';
-            document.getElementById('text-input').value = '';
-            
-            // Esconder Player
-            const wrapper = document.getElementById('slideshow-wrapper');
-            wrapper.classList.add('hidden');
-            wrapper.classList.remove('flex');
-            
-            // Parar Vídeo
-            const videoDisplay = document.getElementById('video-display');
-            videoDisplay.pause();
-            videoDisplay.src = "";
-            videoDisplay.classList.add('hidden');
-            
-            // Esconder Imagem
-            document.getElementById('image-display').classList.add('hidden');
-            document.getElementById('image-display').src = "";
-            
-            // Resetar Texto para Placeholder
-            updateTextDisplay();
-        }
-
-        function updateSlideDisplay() {
-            const imgDisplay = document.getElementById('image-display');
-            const videoDisplay = document.getElementById('video-display');
-            const btnPrev = document.getElementById('btn-prev');
-            const btnNext = document.getElementById('btn-next');
-            const counter = document.getElementById('slide-counter');
-
-            const currentItem = slideItems[currentSlideIndex];
-
-            // Resetar visibilidade
-            imgDisplay.classList.add('hidden');
-            videoDisplay.classList.add('hidden');
-            
-            // Pausar vídeo anterior se existir
-            videoDisplay.pause();
-
-            // Efeito Fade simples
-            if (currentItem.type === 'video') {
-                videoDisplay.src = currentItem.src;
-                videoDisplay.classList.remove('hidden');
-            } else {
-                imgDisplay.src = currentItem.src;
-                imgDisplay.classList.remove('hidden');
-            }
-            
-            // Mostrar/Esconder controles se houver mais de 1 item
-            if (slideItems.length > 1) {
-                btnPrev.classList.remove('hidden');
-                btnNext.classList.remove('hidden');
-                counter.classList.remove('hidden');
-                counter.textContent = `${currentSlideIndex + 1} / ${slideItems.length}`;
-            } else {
-                btnPrev.classList.add('hidden');
-                btnNext.classList.add('hidden');
-                counter.classList.add('hidden');
-            }
-        }
-
-        function changeSlide(step) {
-            currentSlideIndex += step;
-            
-            // Loop infinito
-            if (currentSlideIndex >= slideItems.length) {
-                currentSlideIndex = 0;
-            } else if (currentSlideIndex < 0) {
-                currentSlideIndex = slideItems.length - 1;
-            }
-            
-            updateSlideDisplay();
-        }
-
-        // --- Lógica de Renderização de Texto ---
-        function updateTextDisplay() {
-            const input = document.getElementById('text-input').value;
-            const display = document.getElementById('text-display');
-            
-            if (!input.trim()) {
-                display.innerHTML = '<span class="text-gray-600 opacity-50 text-xl font-sans">Visualização do texto...</span>';
-                return;
-            }
-
-            let formatted = input.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
-            formatted = formatted.replace(/\*([^\*]+)\*/g, 
-                '<span class="neon-blue transition-all duration-300 hover:scale-105 inline-block cursor-default">$1</span>');
-
-            formatted = formatted.replace(/#([^#]+)#/g, 
-                '<span class="neon-yellow transition-all duration-300 hover:scale-105 inline-block cursor-default">$1</span>');
-
-            formatted = formatted.replace(/\n/g, '<br>');
-
-            display.innerHTML = formatted;
         }
 
         // --- Tema (Dark/Light) ---
@@ -617,9 +737,6 @@
                 iconMoon.classList.remove('hidden');
                 iconMoon.classList.add('block');
                 
-                themeToggle.classList.remove('bg-black/50', 'border-gray-600');
-                themeToggle.classList.add('bg-white/50', 'border-gray-300', 'shadow-md');
-                
                 if(separator) {
                     separator.classList.remove('via-gray-700');
                     separator.classList.add('via-gray-400');
@@ -630,9 +747,6 @@
                 iconMoon.classList.add('hidden');
                 iconMoon.classList.remove('block');
                 
-                themeToggle.classList.add('bg-black/50', 'border-gray-600');
-                themeToggle.classList.remove('bg-white/50', 'border-gray-300', 'shadow-md');
-
                 if(separator) {
                     separator.classList.add('via-gray-700');
                     separator.classList.remove('via-gray-400');
